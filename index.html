@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARMSignalX - AI Ultra Terminal</title>
+    <title>ARMSignalX - Pro Live Terminal</title>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { background: #010409; color: white; margin: 0; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
@@ -13,91 +13,61 @@
         .nav-group { display: flex; gap: 8px; align-items: center; }
         .btn-nav { text-decoration: none; font-size: 10px; font-weight: bold; border: 1px solid #30363d; padding: 6px 10px; border-radius: 4px; color: #8b949e; }
 
-        /* AI Status Bar */
-        #ai-status { font-size: 12px; text-align: center; padding: 8px; background: #0c1117; border-bottom: 1px solid #30363d; font-family: monospace; }
-
         /* Controls */
         .controls { background: #0d1117; padding: 10px; display: flex; flex-direction: column; gap: 8px; border-bottom: 1px solid #30363d; }
         .row { display: flex; gap: 8px; }
         select { flex: 1; height: 40px; background: #161b22; color: white; border: 1px solid #30363d; border-radius: 8px; font-weight: bold; padding-left: 5px; }
         .btn-run { background: #238636; flex: 1; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; }
-        .btn-sound { background: #f0883e; width: 45px; border-radius: 8px; border: none; color: white; cursor: pointer; font-size: 18px; }
 
-        .t-btn { flex: 1; height: 35px; background: #21262d; border: 1px solid #30363d; color: white; border-radius: 6px; font-size: 11px; }
-        .t-btn.active { background: #1f6feb; border-color: #58a6ff; }
-
-        /* Main Content Area */
+        /* Main Area */
         .main { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        .box-chart { height: 300px; border-bottom: 1px solid #30363d; flex-shrink: 0; }
+        .box-chart { height: 350px; border-bottom: 1px solid #30363d; flex-shrink: 0; }
+        
+        /* Real Signal Gauge Area */
+        .box-ai { min-height: 450px; background: #0d1117; padding: 10px; flex-shrink: 0; }
+        
+        /* Chat */
+        .chat-box { flex: 1; min-height: 250px; display: flex; flex-direction: column; background: #010409; border-top: 1px solid #30363d; }
+        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 12px; font-family: monospace; }
+        .chat-input-area { padding: 8px; background: #0d1117; display: flex; gap: 5px; }
+        #chat-input { flex: 1; background: #161b22; border: 1px solid #30363d; border-radius: 5px; color: white; padding: 8px; outline: none; }
+        .btn-send { background: #238636; border: none; border-radius: 5px; color: white; padding: 0 15px; cursor: pointer; }
 
-        /* AI Gauge */
-        .box-ai { height: 220px; background: #0d1117; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid #30363d; flex-shrink: 0; }
-        .gauge-container { width: 180px; height: 90px; position: relative; overflow: hidden; }
-        .gauge-bg { width: 180px; height: 180px; border: 12px solid #161b22; border-radius: 50%; border-bottom-color: transparent; transform: rotate(-90deg); }
-        .gauge-fill { width: 180px; height: 180px; border: 12px solid #238636; border-radius: 50%; border-bottom-color: transparent; border-left-color: transparent; position: absolute; top: 0; left: 0; transform: rotate(-90deg); transition: 1s cubic-bezier(0.17, 0.67, 0.83, 0.67); }
-        .gauge-pointer { width: 3px; height: 80px; background: #fff; position: absolute; bottom: 0; left: 50%; transform-origin: bottom center; transform: translateX(-50%) rotate(-90deg); transition: 1s; box-shadow: 0 0 8px #fff; }
-        .ai-label { margin-top: 10px; font-size: 18px; font-weight: bold; text-transform: uppercase; }
-        .ai-stats { font-size: 10px; color: #8b949e; margin-top: 4px; font-family: monospace; }
-
-        /* Chat System */
-        .chat-box { flex: 1; min-height: 200px; display: flex; flex-direction: column; background: #010409; }
-        .chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-size: 12px; }
-        .chat-input-area { padding: 8px; background: #0d1117; display: flex; gap: 5px; border-top: 1px solid #30363d; }
-        #chat-input { flex: 1; background: #161b22; border: 1px solid #30363d; border-radius: 5px; color: white; padding: 5px 10px; outline: none; }
-        .btn-send { background: #238636; border: none; border-radius: 5px; color: white; padding: 0 15px; cursor: pointer; font-weight: bold; }
-
-        .msg { margin-bottom: 8px; line-height: 1.4; }
-        .msg-user { color: #58a6ff; font-weight: bold; }
         .msg-ai { color: #2ea043; font-weight: bold; }
+        .msg-user { color: #58a6ff; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="header">
     <div class="nav-group">
-        <a href="/admin_panel" class="btn-nav" style="color:#f0883e;">ADMIN</a>
-        <a href="/logout" class="btn-nav" style="color:#da3633;">EXIT</a>
-        <span style="font-size: 9px; color: #238636; border: 1px solid #238636; padding: 2px 5px; border-radius: 4px;">AI V3.0</span>
+        <span style="font-size: 12px; font-weight: bold; color: #238636;">ARMSignalX PRO</span>
+        <span style="font-size: 9px; color: #8b949e; border: 1px solid #30363d; padding: 2px 5px; border-radius: 4px;">LIVE DATA</span>
     </div>
-    <button id="autoToggle" onclick="toggleAuto()" style="background:#161b22; color:white; border:1px solid #30363d; padding:5px 10px; border-radius:4px; font-size:10px;">AUTO: OFF</button>
+    <div id="clock" style="font-size: 11px; font-family: monospace; color: #8b949e;">00:00:00</div>
 </div>
-
-<div id="ai-status">AI ENGINE: <span style="color:#8b949e">STANDBY</span></div>
 
 <div class="controls">
     <div class="row">
-        <select id="pair" onchange="update()">
-            <option value="BINANCE:BTCUSDT">BTC / USDT</option>
-            <option value="BINANCE:ETHUSDT">ETH / USDT</option>
-            <option value="FX:EURUSD">EUR / USD</option>
-            <option value="OANDA:XAUUSD">GOLD (Ոսկի)</option>
+        <select id="pairSelect" onchange="changeSymbol()">
+            <option value="BINANCE:BTCUSDT">BTC / USDT (Bitcoin)</option>
+            <option value="BINANCE:ETHUSDT">ETH / USDT (Ethereum)</option>
+            <option value="BINANCE:SOLUSDT">SOL / USDT (Solana)</option>
+            <option value="OANDA:XAUUSD">GOLD / USD (Ոսկի)</option>
         </select>
-        <button class="btn-sound" onclick="initSound()" id="sBtn">🔇</button>
-        <button class="btn-run" onclick="update()">AI SCAN ⚡</button>
-    </div>
-    <div class="row">
-        <button class="t-btn active" onclick="setT('1', this)">1m</button>
-        <button class="t-btn" onclick="setT('5', this)">5m</button>
-        <button class="t-btn" onclick="setT('15', this)">15m</button>
+        <button class="btn-run" onclick="changeSymbol()">UPDATE ⚡</button>
     </div>
 </div>
 
 <div class="main">
-    <div id="chart_div" class="box-chart"></div>
+    <div id="chart_container" class="box-chart"></div>
 
-    <div class="box-ai">
-        <div class="gauge-container">
-            <div class="gauge-bg"></div>
-            <div class="gauge-fill" id="gaugeFill"></div>
-            <div class="gauge-pointer" id="pointer"></div>
+    <div class="box-ai" id="ai_container">
         </div>
-        <div class="ai-label" id="aiLabel">NEUTRAL</div>
-        <div class="ai-stats" id="aiStats">READY FOR ANALYSIS</div>
-    </div>
 
     <div class="chat-box">
         <div class="chat-messages" id="chat-msgs">
-            <div class="msg"><span class="msg-ai">SYSTEM:</span> Բարի գալուստ ARMSignalX Chat: Ինչո՞վ կարող եմ օգնել:</div>
+            <div style="color: #8b949e;">[SYSTEM] Բոլոր համակարգերը պատրաստ են: Իրական ժամանակի սիգնալները միացված են:</div>
         </div>
         <div class="chat-input-area">
             <input type="text" id="chat-input" placeholder="Հարցրու AI-ին...">
@@ -106,115 +76,90 @@
     </div>
 </div>
 
-<script src="https://s3.tradingview.com/tv.js"></script>
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 <script>
-    let aCtx = null, auto = false, timer = null, curT = '1';
+    let currentSymbol = "BINANCE:BTCUSDT";
 
-    function initSound() {
-        if (!aCtx) aCtx = new (window.AudioContext || window.webkitAudioContext)();
-        document.getElementById('sBtn').innerText = "🔊";
-        document.getElementById('sBtn').style.background = "#238636";
-        addChatMessage("SYSTEM", "Ձայնային ազդանշանները միացված են:");
-    }
-
-    function setT(t, b) {
-        curT = t;
-        document.querySelectorAll('.t-btn').forEach(btn => btn.classList.remove('active'));
-        b.classList.add('active');
-        update();
-    }
-
-    function toggleAuto() {
-        auto = !auto;
-        document.getElementById('autoToggle').innerText = auto ? "AUTO: ON" : "AUTO: OFF";
-        document.getElementById('autoToggle').style.background = auto ? "#238636" : "#161b22";
-        if(auto) { update(); timer = setInterval(update, 60000); }
-        else clearInterval(timer);
-    }
-
-    function update() {
-        const symbol = document.getElementById('pair').value;
-        document.getElementById('ai-status').innerHTML = `AI ENGINE: <span style="color:#f0883e">ANALYZING CLUSTER...</span>`;
-
+    // 1. Ֆունկցիա՝ Գրաֆիկը թարմացնելու համար
+    function loadChart(symbol) {
         new TradingView.widget({
             "autosize": true,
             "symbol": symbol,
-            "interval": curT,
+            "interval": "1",
+            "timezone": "Etc/UTC",
             "theme": "dark",
-            "container_id": "chart_div",
+            "style": "1",
+            "locale": "en",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
             "hide_top_toolbar": true,
-            "studies": [
-                "GainZalgoV2@tv-basicstudies"
-            ]
+            "container_id": "chart_container"
         });
-
-        setTimeout(() => runAI(symbol), 1500);
     }
 
-    function runAI(symbol) {
-        const score = Math.floor(Math.random() * 100);
-        const pointer = document.getElementById('pointer');
-        const fill = document.getElementById('gaugeFill');
-        const label = document.getElementById('aiLabel');
-        const status = document.getElementById('ai-status');
-        const stats = document.getElementById('aiStats');
-
-        const angle = (score * 1.8) - 90;
-        pointer.style.transform = `translateX(-50%) rotate(${angle}deg)`;
-
-        let decision, color;
-        if (score > 80) { decision = "Strong Buy"; color = "#00ff00"; playSignalSound(880); }
-        else if (score > 60) { decision = "Buy"; color = "#2ea043"; }
-        else if (score > 40) { decision = "Neutral"; color = "#58a6ff"; }
-        else if (score > 20) { decision = "Sell"; color = "#da3633"; }
-        else { decision = "Strong Sell"; color = "#ff0000"; playSignalSound(440); }
-
-        fill.style.borderColor = `transparent transparent ${color} ${color}`;
-        label.innerText = decision;
-        label.style.color = color;
-        status.innerHTML = `AI DECISION: <span style="color:${color}; font-weight:bold;">${decision.toUpperCase()} [${score}% Accuracy]</span>`;
-        stats.innerText = `TREND: OK | RSI: ${Math.floor(Math.random()*40+30)} | CLUSTER SYNC: 100%`;
+    // 2. Ֆունկցիա՝ Իրական Սիգնալի վիդջեթը թարմացնելու համար
+    function loadSignalWidget(symbol) {
+        const container = document.getElementById('ai_container');
+        container.innerHTML = ''; // Մաքրել հինը
+        
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js';
+        script.async = true;
+        
+        const config = {
+            "interval": "1m",
+            "width": "100%",
+            "isTransparent": false,
+            "height": "420",
+            "symbol": symbol,
+            "showIntervalTabs": true,
+            "displayMode": "single",
+            "locale": "en",
+            "colorTheme": "dark"
+        };
+        
+        script.innerHTML = JSON.stringify(config);
+        container.appendChild(script);
     }
 
-    function playSignalSound(freq) {
-        if (!aCtx) return;
-        let o = aCtx.createOscillator(), g = aCtx.createGain();
-        o.connect(g); g.connect(aCtx.destination);
-        o.frequency.setValueAtTime(freq, aCtx.currentTime);
-        o.start();
-        g.gain.exponentialRampToValueAtTime(0.00001, aCtx.currentTime + 0.6);
-        o.stop(aCtx.currentTime + 0.6);
+    // 3. Փոխել արժույթը
+    function changeSymbol() {
+        currentSymbol = document.getElementById('pairSelect').value;
+        loadChart(currentSymbol);
+        loadSignalWidget(currentSymbol);
+        addLog("SYSTEM", `Արժույթը փոխվեց: Նոր թիրախ՝ ${currentSymbol}`);
     }
+
+    // Լրացուցիչ ֆունկցիաներ (Ժամացույց և Chat)
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toLocaleTimeString();
+    }
+    setInterval(updateClock, 1000);
 
     function sendMessage() {
         const input = document.getElementById('chat-input');
-        const text = input.value.trim();
-        if (!text) return;
-
-        addChatMessage("USER", text);
-        input.value = "";
-
+        if (!input.value) return;
+        addLog("USER", input.value);
         setTimeout(() => {
-            let aiResp = "Վերլուծում եմ տվյալները... Ըստ AI-ի, այս պահին շուկան կայուն է:";
-            if(text.toLowerCase().includes("buy")) aiResp = "AI-ն խորհուրդ է տալիս սպասել 'Strong' հաստատմանը:";
-            addChatMessage("AI", aiResp);
+            addLog("AI", "Վերլուծելով շուկայի տվյալները՝ խորհուրդ եմ տալիս հետևել Strong Buy/Sell գոտիներին:");
         }, 1000);
+        input.value = "";
     }
 
-    function addChatMessage(sender, text) {
-        const chatMsgs = document.getElementById('chat-msgs');
-        const div = document.createElement('div');
-        div.className = "msg";
-        div.innerHTML = `<span class="msg-${sender.toLowerCase()}">${sender}:</span> ${text}`;
-        chatMsgs.appendChild(div);
-        chatMsgs.scrollTop = chatMsgs.scrollHeight;
+    function addLog(sender, text) {
+        const msgs = document.getElementById('chat-msgs');
+        msgs.innerHTML += `<div><span class="msg-${sender.toLowerCase()}">${sender}:</span> ${text}</div>`;
+        msgs.scrollTop = msgs.scrollHeight;
     }
 
-    document.getElementById('chat-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-
-    window.onload = update;
+    // Առաջին անգամ բեռնելիս
+    window.onload = () => {
+        loadChart(currentSymbol);
+        loadSignalWidget(currentSymbol);
+    };
 </script>
+
 </body>
 </html>
