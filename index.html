@@ -3,47 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARMSignalX Terminal</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>ARM Signal X - Real-Time Dashboard</title>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; }
-        .container { margin-top: 50px; }
-        #gauge-container { width: 300px; margin: 0 auto; }
-        .signal-info { margin-top: 20px; font-size: 24px; color: #0f0; }
+        body { background-color: #0d1117; color: white; font-family: Arial, sans-serif; margin: 0; padding: 10px; text-align: center; }
+        .container { max-width: 1200px; margin: auto; }
+        .header { padding: 20px; border-bottom: 1px solid #30363d; margin-bottom: 20px; }
+        .signal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 15px; }
+        h2 { color: #58a6ff; font-size: 1.2rem; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>ARM SIGNAL TERMINAL</h1>
-        <div id="gauge-container">
-            <canvas id="gaugeChart"></canvas>
-        </div>
-        <div id="info" class="signal-info">Սպասում ենք սիգնալի...</div>
+
+<div class="container">
+    <div class="header">
+        <h1>ARM Signal X - Իրական Սիգնալներ</h1>
+        <p>Տվյալները թարմանում են վայրկյանական</p>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const ctx = document.getElementById('gaugeChart').getContext('2d');
-        let score = 50;
+    <div class="signal-grid">
+        <div class="card">
+            <h2>BTC / USDT Գրաֆիկ</h2>
+            <div id="tradingview_chart" style="height: 400px;"></div>
+        </div>
 
-        const chart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                    data: [score, 100 - score],
-                    backgroundColor: ['#0f0', '#333'],
-                    borderWidth: 0
-                }]
-            },
-            options: { rotation: -90, circumference: 180, cutout: '80%' }
-        });
+        <div class="card">
+            <h2>Տեխնիկական Անալիզ (Սիգնալ)</h2>
+            <div class="tradingview-widget-container">
+                <div class="tradingview-widget-container__widget"></div>
+                <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
+                {
+                    "interval": "1m",
+                    "width": "100%",
+                    "isTransparent": false,
+                    "height": "380",
+                    "symbol": "BINANCE:BTCUSDT",
+                    "showIntervalTabs": true,
+                    "displayMode": "single",
+                    "locale": "en",
+                    "colorTheme": "dark"
+                }
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
 
-        const socket = io();
-        socket.on('new_signal', (data) => {
-            document.getElementById('info').innerText = data.pair + ": " + data.decision;
-            chart.data.datasets[0].data = [data.score, 100 - data.score];
-            chart.update();
-        });
-    </script>
+<script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+<script type="text/javascript">
+  new TradingView.widget({
+    "width": "100%",
+    "height": 400,
+    "symbol": "BINANCE:BTCUSDT",
+    "interval": "1",
+    "timezone": "Etc/UTC",
+    "theme": "dark",
+    "style": "1",
+    "locale": "en",
+    "toolbar_bg": "#f1f3f6",
+    "enable_publishing": false,
+    "allow_symbol_change": true,
+    "container_id": "tradingview_chart"
+  });
+</script>
+
 </body>
 </html>
