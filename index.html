@@ -1,6 +1,49 @@
-const socket = io();
-socket.on('new_signal', (data) => {
-    // Այստեղ գրեք այն ֆունկցիան, որը շարժում է սլաքը
-    // Օրինակ՝ updateGauge(data.score);
-    console.log("New Signal:", data);
-});
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARMSignalX Terminal</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { background: #000; color: #fff; font-family: sans-serif; text-align: center; }
+        .container { margin-top: 50px; }
+        #gauge-container { width: 300px; margin: 0 auto; }
+        .signal-info { margin-top: 20px; font-size: 24px; color: #0f0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ARM SIGNAL TERMINAL</h1>
+        <div id="gauge-container">
+            <canvas id="gaugeChart"></canvas>
+        </div>
+        <div id="info" class="signal-info">Սպասում ենք սիգնալի...</div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const ctx = document.getElementById('gaugeChart').getContext('2d');
+        let score = 50;
+
+        const chart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [score, 100 - score],
+                    backgroundColor: ['#0f0', '#333'],
+                    borderWidth: 0
+                }]
+            },
+            options: { rotation: -90, circumference: 180, cutout: '80%' }
+        });
+
+        const socket = io();
+        socket.on('new_signal', (data) => {
+            document.getElementById('info').innerText = data.pair + ": " + data.decision;
+            chart.data.datasets[0].data = [data.score, 100 - data.score];
+            chart.update();
+        });
+    </script>
+</body>
+</html>
