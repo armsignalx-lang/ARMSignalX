@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Panel - ARMSignalX</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { background: #010409; color: #f0f6fc; font-family: -apple-system, sans-serif; margin: 0; padding: 10px; }
+        .card { background: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 8px; margin-bottom: 15px; }
+        .table-wrapper { width: 100%; overflow-x: auto; border: 1px solid #30363d; border-radius: 8px; background: #0d1117; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid #30363d; font-size: 13px; }
+        th { background: #161b22; color: #8b949e; text-transform: uppercase; font-size: 11px; }
+        .user-info b { color: #58a6ff; display: block; font-size: 14px; }
+        .user-info span { color: #8b949e; font-size: 12px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .online { background: #3fb950; box-shadow: 0 0 5px #3fb950; }
+        .offline { background: #484f58; }
+        .btn-group { display: flex; gap: 5px; }
+        .btn { border: none; padding: 6px 10px; border-radius: 6px; color: white; font-weight: bold; cursor: pointer; font-size: 11px; transition: 0.2s; }
+        .btn-ok { background: #238636; }
+        .btn-kick { background: #f0883e; }
+        .btn-no { background: #da3633; }
+        textarea { width: 100%; height: 60px; background: #010409; color: white; border: 1px solid #30363d; border-radius: 6px; padding: 10px; resize: none; }
+    </style>
+</head>
+<body>
+
+    <h2 style="text-align:center; font-size:18px;">ԱԴՄԻՆ ԿԱՌԱՎԱՐՈՒՄ</h2>
+
+    <div class="card">
+        <form action="{{ url_for('update_announcement') }}" method="POST">
+            <textarea name="announcement_text" placeholder="Գրեք նոր ծանուցումը բոլորի համար..."></textarea>
+            <button type="submit" class="btn btn-ok" style="width:100%; margin-top:10px; height:35px;">ԾԱՆՈՒՑԵԼ ԲՈԼՈՐԻՆ</button>
+        </form>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Օգտատեր / Անուն</th>
+                    <th>Կապ</th>
+                    <th>Կարգավիճակ</th>
+                    <th>Գործողություն</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr>
+                    <td class="user-info">
+                        <b>{{ u.username }}</b>
+                        <span>{{ u.full_name }}</span>
+                    </td>
+                    <td class="user-info">
+                        <span>📧 {{ u.email }}</span><br>
+                        <span>📞 {{ u.phone }}</span>
+                    </td>
+                    <td>
+                        {% if u.last_seen and now and (now - u.last_seen).total_seconds() < 300 %}
+                            <span class="status-dot online"></span> <span style="color:#3fb950">Online</span>
+                        {% else %}
+                            <span class="status-dot offline"></span> <span style="color:#8b949e">Offline</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            {% if not u.is_approved %}
+                            <form action="{{ url_for('approve_user', user_id=u.id) }}" method="POST">
+                                <button type="submit" class="btn btn-ok">ԱՅՈ</button>
+                            </form>
+                            {% else %}
+                            <form action="{{ url_for('kick_user', user_id=u.id) }}" method="POST">
+                                <button type="submit" class="btn btn-kick">KICK</button>
+                            </form>
+                            {% endif %}
+
+                            <form action="{{ url_for('reject_user', user_id=u.id) }}" method="POST" onsubmit="return confirm('Իսկապե՞ս ցանկանում եք հեռացնել այս օգտատիրոջը ընդմիշտ։');">
+                                <button type="submit" class="btn btn-no">ՋՆՋԵԼ</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <p style="text-align:center;"><a href="/" style="color:#58a6ff; text-decoration:none;">← Հետ դեպի գրաֆիկ</a></p>
+
+</body>
+</html>
