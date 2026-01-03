@@ -10,14 +10,14 @@ const io = new Server(server);
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Սա բացում է քո index.html-ը
+// Հիմնական էջը բացելու համար
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Սա ստանում է սիգնալը TradingView-ից
+// TradingView Webhook-ի համար
 app.post('/webhook', (req, res) => {
-    console.log('Signal received:', req.body);
+    console.log('Ստացված սիգնալ:', req.body);
     io.emit('new_signal', req.body);
     res.sendStatus(200);
 });
