@@ -1,0 +1,6 @@
+const socket = io();
+socket.on('new_signal', (data) => {
+    // Այստեղ գրեք այն ֆունկցիան, որը շարժում է սլաքը
+    // Օրինակ՝ updateGauge(data.score);
+    console.log("New Signal:", data);
+});
